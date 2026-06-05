@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -5,9 +6,13 @@ app = Flask(__name__)
 app.secret_key = "mysecretkey"
 
 # ==================== POSTGRESQL DATABASE CONFIG ====================
-# Render-ல் காப்பி செய்த Internal Database URL-ஐ கீழே உள்ள ஒற்றை மேற்கோள் குறிக்குள் (' ') பேஸ்ட் செய்யவும்.
-# குறிப்பு: லிங்க் 'postgres://' என்று தொடங்கினால், அதை 'postgresql://' என்று மாற்றவும்.
-app.config['SQLALCHEMY_DATABASE_URI'] = 'உங்களோட_Render_Internal_Database_URL_இங்கே_போடவும்'
+raw_db_url = 'உங்களோட_Render_Internal_Database_URL_இங்கே_போடவும்'
+
+# Render லிங்க்கில் 'postgres://' என்று இருந்தால் அதை 'postgresql://' என்று தானாக மாற்றும் சின்ன ட்ரிக்
+if raw_db_url and raw_db_url.startswith("postgres://"):
+    raw_db_url = raw_db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = raw_db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
