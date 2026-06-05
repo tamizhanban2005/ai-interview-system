@@ -1,18 +1,39 @@
-import mysql.connector
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = "mysecretkey"
 
-# Database Connection
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="ai_interview_system"
-)
+# ==================== POSTGRESQL DATABASE CONFIG ====================
+# Render-ல் காப்பி செய்த Internal Database URL-ஐ கீழே உள்ள ஒற்றை மேற்கோள் குறிக்குள் (' ') பேஸ்ட் செய்யவும்.
+# குறிப்பு: லிங்க் 'postgres://' என்று தொடங்கினால், அதை 'postgresql://' என்று மாற்றவும்.
+app.config['SQLALCHEMY_DATABASE_URI'] = 'உங்களோட_Render_Internal_Database_URL_இங்கே_போடவும்'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-print("Database Connected")
+db = SQLAlchemy(app)
+
+# ==================== DATABASE MODELS (TABLES) ====================
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    fullname = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
+class Result(db.Model):
+    __tablename__ = 'results'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), nullable=False)
+    test_type = db.Column(db.String(50), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+
+# ஆன்லைனில் ரன் ஆகும்போது தானாக டேபிள்களை உருவாக்க இது உதவும்
+with app.app_context():
+    db.create_all()
+
+print("PostgreSQL Database Connected & Tables Checked Successfully!")
+
 
 # ==================== LOGIN ROUTE ====================
 @app.route('/', methods=['GET', 'POST'])
@@ -21,13 +42,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        cursor = db.cursor()
-        cursor.execute(
-            "SELECT * FROM users WHERE username=%s AND password=%s",
-            (username, password)
-        )
-        user = cursor.fetchone()
-        cursor.close()
+        # SQLAlchemy மூலம் பயனர் விவரங்களைச் சரிபார்த்தல்
+        user = User.query.filter_by(username=username, password=password).first()
         
         if user:
             session['username'] = username
@@ -47,13 +63,11 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
-        cursor = db.cursor()
-        cursor.execute(
-            "INSERT INTO users (fullname, email, username, password) VALUES (%s, %s, %s, %s)",
-            (fullname, email, username, password)
-        )
-        db.commit()
-        cursor.close()
+        # புதிய பயனரை உருவாக்குதல்
+        new_user = User(fullname=fullname, email=email, username=username, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -68,27 +82,12 @@ def result():
 # ==================== DASHBOARD ROUTE ====================
 @app.route('/dashboard')
 def dashboard():
-
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    cursor = db.cursor()
-
-    # Aptitude count
-    cursor.execute(
-        "SELECT COUNT(*) FROM results WHERE username=%s AND test_type='Aptitude'",
-        (session['username'],)
-    )
-    aptitude_count = cursor.fetchone()[0]
-
-    # Technical count
-    cursor.execute(
-        "SELECT COUNT(*) FROM results WHERE username=%s AND test_type='Technical'",
-        (session['username'],)
-    )
-    technical_count = cursor.fetchone()[0]
-
-    cursor.close()
+    # SQLAlchemy மூலம் தேர்வுகளின் எண்ணிக்கையைக் கணக்கிடுதல்
+    aptitude_count = Result.query.filter_by(username=session['username'], test_type='Aptitude').count()
+    technical_count = Result.query.filter_by(username=session['username'], test_type='Technical').count()
 
     return render_template(
         'dashboard.html',
@@ -96,32 +95,30 @@ def dashboard():
         aptitude_count=aptitude_count,
         technical_count=technical_count
     )
+
+
 # ==================== CHECK APTITUDE ====================
 @app.route('/check_aptitude', methods=['POST'])
 def check_aptitude():
+    if 'username' not in session:
+        return redirect(url_for('login'))
 
     score = 0
-
     q1 = request.form.get('q1')
     q2 = request.form.get('q2')
 
     if q1 == "10":
         score += 1
-
     if q2 == "20":
         score += 1
 
-    cursor = db.cursor()
-
-    cursor.execute(
-        "INSERT INTO results (username, test_type, score) VALUES (%s, %s, %s)",
-        (session['username'], 'Aptitude', score)
-    )
-
-    db.commit()
-    cursor.close()
+    # தேர்வு முடிவைச் சேமித்தல்
+    new_result = Result(username=session['username'], test_type='Aptitude', score=score)
+    db.session.add(new_result)
+    db.session.commit()
 
     return render_template("result.html", score=score, total=2)
+
 
 # ==================== APTITUDE ROUTE ====================
 @app.route('/aptitude')
@@ -149,44 +146,38 @@ def technical():
 # ==================== CHECK TECHNICAL ====================
 @app.route('/check_technical', methods=['POST'])
 def check_technical():
+    if 'username' not in session:
+        return redirect(url_for('login'))
 
     score = 0
-
     if request.form.get('q1') == "Python":
         score += 1
-
     if request.form.get('q2') == "Programming Language":
         score += 1
-
     if request.form.get('q3') == "Structured Query Language":
         score += 1
-
     if request.form.get('q4') == "Database Management System":
         score += 1
 
-    cursor = db.cursor()
-
-    cursor.execute(
-        "INSERT INTO results (username, test_type, score) VALUES (%s, %s, %s)",
-        (session['username'], 'Technical', score)
-    )
-
-    db.commit()
-    cursor.close()
+    # தேர்வு முடிவைச் சேமித்தல்
+    new_result = Result(username=session['username'], test_type='Technical', score=score)
+    db.session.add(new_result)
+    db.session.commit()
 
     return render_template("result.html", score=score, total=4)
-#=====================hr============
+
+
+# ==================== HR ROUTE ====================
 @app.route('/hr')
 def hr():
     if 'username' not in session:
         return redirect(url_for('login'))
-
     return render_template('hr.html')
 
-#=====submit hr====
+
+# ==================== SUBMIT HR ====================
 @app.route('/submit_hr', methods=['POST'])
 def submit_hr():
-
     return """
     <h1>HR Round Submitted Successfully ✅</h1>
     <br>
@@ -194,6 +185,7 @@ def submit_hr():
         <button>Back to Dashboard</button>
     </a>
     """
+
 
 # ==================== MAIN START ====================
 if __name__ == '__main__':
