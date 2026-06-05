@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+</head>
+<body>
+
+<h1>My Test History</h1>
+
+<table border="1">
+    <tr>
+        <th>Test Type</th>
+        <th>Score</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<br>
+
+<a href="/dashboard">
+    <button>Back to Dashboard</button>
+</a>
+
+</body>
+</html>

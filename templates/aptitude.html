@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aptitude Test</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #eef2f7;
+        }
+
+        .box {
+            width: 50%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .q {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .q p {
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #2c3e50;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1a252f;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>Aptitude Test</h1>
+
+    <form action="/check_aptitude" method="POST">
+
+        <div class="q">
+            <p>1. 5 + 5 = ?</p>
+            <label><input type="radio" name="q1" value="10"> 10</label>
+            <label><input type="radio" name="q1" value="20"> 20</label>
+        </div>
+
+        <div class="q">
+            <p>2. 10 × 2 = ?</p>
+            <label><input type="radio" name="q2" value="20"> 20</label>
+            <label><input type="radio" name="q2" value="15"> 15</label>
+        </div>
+
+        <button type="submit">Submit Test</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

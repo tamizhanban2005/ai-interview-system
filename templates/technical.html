@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Technical Quiz</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #eef2f7;
+        }
+
+        .box {
+            width: 55%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .q {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .q p {
+            font-weight: bold;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #2c3e50;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1a252f;
+            transform: scale(1.02);
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>Technical Quiz</h1>
+
+    <form action="/check_technical" method="POST">
+
+        <div class="q">
+            <p>1. Which language is used in Flask?</p>
+            <label><input type="radio" name="q1" value="java"> Java</label>
+            <label><input type="radio" name="q1" value="Python"> Python</label>
+            <label><input type="radio" name="q1" value="c++"> C++</label>
+        </div>
+
+        <div class="q">
+            <p>2. Python is a?</p>
+            <label><input type="radio" name="q2" value="Programming Language"> Programming Language</label>
+            <label><input type="radio" name="q2" value="Database"> Database</label>
+        </div>
+
+        <div class="q">
+            <p>3. SQL stands for?</p>
+            <label><input type="radio" name="q3" value="Structured Query Language"> Structured Query Language</label>
+            <label><input type="radio" name="q3" value="Simple Query Language"> Simple Query Language</label>
+        </div>
+
+        <div class="q">
+            <p>4. DBMS means?</p>
+            <label><input type="radio" name="q4" value="Database Management System"> Database Management System</label>
+            <label><input type="radio" name="q4" value="Data Backup Management System"> Data Backup Management System</label>
+        </div>
+
+        <button type="submit">Submit Quiz</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

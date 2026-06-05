@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 300px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .score {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #4facfe;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #4facfe;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .btn:hover {
+            background: #007acc;
+        }
+
+        .status {
+            font-size: 18px;
+            margin-top: 10px;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h1>Your Result</h1>
+
+        <div class="score">
+            {{ score }}/{{ total }}
+        </div>
+
+        <div class="status">
+            {% if score == total %}
+                🎉 Excellent!
+            {% elif score >= 2 %}
+                👍 Good Job!
+            {% else %}
+                😅 Try Again!
+            {% endif %}
+        </div>
+
+        <a href="/dashboard" class="btn">Back to Dashboard</a>
+
+    </div>
+
+<h2>{{ message }}</h2>
+
+<a href="/dashboard">
+    
+</a>
+
+    
+
+</body>
+</html>
